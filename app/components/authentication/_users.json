@@ -1,0 +1,6 @@
+[{
+  "user": "String",
+  "password": "String",
+  "usertype": "String",
+  "id": "Int"
+}]

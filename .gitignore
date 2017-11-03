@@ -1,0 +1,6 @@
+/node_modules/
+/.settings/
+/.history/
+/.vscode/
+**/config.json
+**/users.json

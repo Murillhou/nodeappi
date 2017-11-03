@@ -1,0 +1,12 @@
+{
+  "keepalive": 60,
+  "reschedulePings": true,
+  "protocolId": "MQTT",
+  "protocolVersion": 4,
+  "clean": true,
+  "reconnectPeriod": 1000,
+  "connectTimeout": 30000,
+  "queueQoSZero": true,
+  "resubscribe": true
+
+}

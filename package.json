@@ -1,0 +1,36 @@
+{
+  "name": "nodeappi",
+  "version": "1.0.0",
+  "description": "Node.js + express simple API.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node bin/www",
+    "test": "node_modules/.bin/mocha --reporter spec --timeout 30000"
+  },
+  "author": "Murillhou",
+  "license": "MIT",
+  "dependencies": {
+    "app-root-path": "2.0.1",
+    "body-parser": "1.18.2",
+    "cors": "2.8.4",
+    "express": "4.16.2",
+    "helmet": "3.9.0",
+    "jwt-simple": "0.5.1",
+    "lodash": "4.17.4",
+    "morgan": "1.9.0",
+    "mqtt": "2.13.1",
+    "passport": "0.4.0",
+    "passport-jwt": "2.2.1",
+    "path": "0.12.7",
+    "slack": "9.0.5"
+  },
+  "engines": {
+    "node": "8.2.1",
+    "npm": "5.3.0"
+  },
+  "devDependencies": {
+    "chai": "4.1.2",
+    "chai-as-promised": "7.1.1",
+    "mocha": "4.0.1"
+  }
+}
