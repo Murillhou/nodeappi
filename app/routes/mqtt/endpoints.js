@@ -1,12 +1,16 @@
   const path = require('path'),
     rootPath = require('app-root-path'),
-    auth = require(path.join(rootPath.toString(), 'app', 'components', 'authentication'));
+    authFunctions = require(
+      path.join(rootPath.toString(), 'app', 'components', 'authentication', 'functions')
+    );
 
   const getPublishEndpoint = mqttClients => (req, res) => {
-    mqttClients.newClient('mqtt://test.mosquitto.org', 1883, auth.getUserId(req, res))
+    mqttClients.newClient('mqtt://test.mosquitto.org', 1883, authFunctions.getUserId(req, res))
       .then(result => {
         console.log(result.msg);
-        return mqttClients.publish(req.body.topic, req.body.message, 1, false, getUserId(req, res));
+        return mqttClients.publish(
+          req.body.topic, req.body.message, 1, false, authFunctions.getUserId(req, res)
+        );
       })
       .then(result => {
         console.log(result.msg);

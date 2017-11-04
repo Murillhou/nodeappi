@@ -3,6 +3,6 @@ const express = require('express'),
 
 router.use('/mqtt', require('./mqtt'));
 router.use('/slack', require('./slack'));
-router.get('/', require('./hello'))
+router.get('/', require('./hello'));
 
 module.exports = router;

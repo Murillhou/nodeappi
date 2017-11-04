@@ -2,7 +2,8 @@ module.exports = (req, res) =>
   res.status(200).json({
     success: true,
     data: {
-      router: [{
+      name: 'mqtt-clients',
+      routes: [{
         URL: '/publish',
         method: 'POST',
         Authentication: 'JWT',

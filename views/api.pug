@@ -1,0 +1,32 @@
+extends ../node_modules/pug-bootstrap/_bootstrap
+append styles
+	//	!-- Custom styles for this template --
+	link(href="../css/cover.css", rel="stylesheet")
+	<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+block body
+	.site-wrapper
+		.site-wrapper-inner
+			.cover-container
+				.masthead.clearfix
+					.inner
+						h3.masthead-brand Nodeappi
+						nav
+							ul.nav.masthead-nav
+								li
+									a(href="/") Home
+								li.active 
+									a(href="#") API
+								li
+									a(href="/contact") Contact
+				.inner.cover
+					+img-responsive-center("/images/carousel1.jpg", "carousel")
+					h1.cover-heading #{bodyheader}
+					p.lead #{bodytext}
+					p.lead
+					a(href="/api", class="btn btn-lg btn-default") Start exploring the API
+
+				.mastfoot
+					.inner
+						p This project is available on <a href="https://github.com/Murillhou/nodeappi">Github </a>.
+						<a class="github-button" href="https://github.com/Murillhou/nodeappi/archive/master.zip" data-icon="octicon-cloud-download" data-show-count="true" aria-label="Download Murillhou/nodeappi on GitHub">Download</a><a class="github-button" href="https://github.com/Murillhou/nodeappi/star" data-icon="octicon-star" data-show-count="true" aria-label="Star Murillhou/nodeappi on GitHub">Star </a><a class="github-button" href="https://github.com/Murillhou/nodeappi/fork" data-show-count="true" data-icon="octicon-repo-forked" aria-label="Fork Murillhou/nodeappi on GitHub">Fork </a>

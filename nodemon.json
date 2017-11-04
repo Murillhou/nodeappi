@@ -7,9 +7,10 @@
   "verbose": false,
   "watch": [
     "app",
-    "public"
+    "public",
+    "views"
   ],
-  "ext": "js json",
+  "ext": "js json css pug",
   "env": {
     "NODE_ENV": "dev"
   }

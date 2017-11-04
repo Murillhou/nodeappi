@@ -2,7 +2,8 @@ module.exports = (req, res) =>
   res.status(200).json({
     success: true,
     data: {
-      router: [{
+      name: 'slackbot',
+      routes: [{
         URL: '/postmessage',
         method: 'POST',
         Authentication: 'JWT',
