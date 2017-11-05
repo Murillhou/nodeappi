@@ -1,8 +1,9 @@
 const _ = require('lodash'),
   jwt = require('jwt-simple'),
   path = require('path'),
-  config = require(path.join(__dirname, 'config')),
-  users = require(path.join(__dirname, 'users'));
+  config = require(path.join(__dirname, 'config'));
+
+const buildToken = user => 'JWT ' + jwt.encode(user, config.secret);
 
 // Function that get the token from the request
 const getToken = (req, res) => {
@@ -18,28 +19,18 @@ const getToken = (req, res) => {
   }
 };
 // This gets the user id from a encoded token
-const getUserId = (req, res) => {
-  var decoded = jwt.decode(getToken(req, res), config.secret);
-  return decoded[0].user;
-};
+const getUserId = (req, res) =>
+  jwt.decode(getToken(req, res), config.secret)[0].user;
 
-const authenticateUser = (req, res) => {
-  const user = _.filter(users, o => o.user === req.body.user && o.password === req.body.password);
-  if(user.length === 1) {
-    res.status(200).send({
-      success: true,
-      token: 'JWT ' + jwt.encode(user, config.secret)
-    });
-  } else {
-    res.status(400).send({
-      success: false,
-      msg: 'Authentication failed. Wrong password.'
-    });
-  }
-};
+const authenticateUser = (user, password) =>
+  _.filter(
+    require(path.join(__dirname, 'users')),
+    o => o.user === user && o.password === password
+  ).length === 1;
 
 module.exports = {
   authenticateUser,
+  buildToken,
   getToken,
   getUserId
 };

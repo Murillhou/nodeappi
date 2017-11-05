@@ -4,15 +4,21 @@ module.exports = (req, res) =>
     data: {
       name: 'api',
       routes: [{
+          URL: '/authenticate',
+          method: 'POST',
+          description: 'JWT authentication endpoint.',
+          response: '{succes: boolean, token: JSONWebToken}'
+        },
+        {
           URL: '/mqtt',
           method: 'GET',
-          description: 'MQTT client API root path.',
+          description: 'MQTT clients API root path.',
           response: '{succes: boolean, data: Object}'
         },
         {
           URL: '/slack',
           method: 'GET',
-          description: 'MQTT client API root path.',
+          description: 'Slack-bot API root path.',
           response: '{succes: boolean, data: Object}'
         }
       ]

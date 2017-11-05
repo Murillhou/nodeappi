@@ -1,7 +1,7 @@
-const express = require('express'),
-  router = express.Router(),
-  f = require('./functions');
+const configPassport = require('./config-passport'),
+  functions = require('./functions');
 
-
-router.post('/authenticate', f.authenticateUser);
-module.exports = router;
+module.exports = {
+  functions,
+  configPassport
+};
