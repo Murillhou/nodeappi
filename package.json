@@ -5,15 +5,19 @@
   "main": "bin/www",
   "scripts": {
     "start": "node bin/www",
-    "test": "node_modules/.bin/mocha --reporter spec --timeout 30000"
+    "test": "mocha --reporter spec --timeout 30000 app/**/*.spec.js",
+    "tdd": "mocha -w --reporter spec --timeout 30000 app/**/*.spec.js"
   },
   "author": "Murillhou",
   "license": "MIT",
   "dependencies": {
     "app-root-path": "2.0.1",
     "body-parser": "1.18.2",
+    "bunyan": "^1.8.12",
+    "bunyan-prettystream": "^0.1.3",
     "cors": "2.8.4",
     "express": "4.16.2",
+    "fs": "0.0.1-security",
     "helmet": "3.9.0",
     "jwt-simple": "0.5.1",
     "lodash": "4.17.4",
@@ -24,7 +28,8 @@
     "path": "0.12.7",
     "pug": "^2.0.0-rc.4",
     "pug-bootstrap": "0.0.15",
-    "slack": "9.0.5"
+    "slack": "9.0.5",
+    "util": "^0.10.3"
   },
   "engines": {
     "node": "8.2.1",
@@ -33,6 +38,8 @@
   "devDependencies": {
     "chai": "4.1.2",
     "chai-as-promised": "7.1.1",
-    "mocha": "4.0.1"
+    "mocha": "4.0.1",
+    "sinon": "^4.1.1",
+    "sinon-chai": "^2.14.0"
   }
 }
