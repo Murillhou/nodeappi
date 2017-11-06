@@ -1,3 +1,2 @@
-const Clients = require('./mqtt-clients'),
-  config = require('./config');
-module.exports = new Clients(config.maxClients);
+const Clients = require('./mqtt-clients');
+module.exports = new Clients(process.env.mqttMaxClients);

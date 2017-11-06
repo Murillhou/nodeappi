@@ -1,9 +1,8 @@
 const _ = require('lodash'),
   jwt = require('jwt-simple'),
-  path = require('path'),
-  config = require(path.join(__dirname, 'config'));
+  path = require('path');
 
-const buildToken = user => 'JWT ' + jwt.encode(user, config.secret);
+const buildToken = user => 'JWT ' + jwt.encode(user, process.env.authentication.secret);
 
 // Function that get the token from the request
 const getToken = (req, res) => {
@@ -20,7 +19,7 @@ const getToken = (req, res) => {
 };
 // This gets the user id from a encoded token
 const getUserId = (req, res) =>
-  jwt.decode(getToken(req, res), config.secret)[0].user;
+  jwt.decode(getToken(req, res), process.env.authentication.secret)[0].user;
 
 const authenticateUser = (user, password) =>
   _.filter(

@@ -1,6 +1,0 @@
-{
-  "secret": "String",
-  "password": "String",
-  "port": "Int",
-  "maxMQTTClients": "Int"
-}
