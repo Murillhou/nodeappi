@@ -1,5 +1,6 @@
 // Required files, libraries and modules
 const express = require('express'),
+  mongoose = require('mongoose'),
   morgan = require('morgan'),
   bodyParser = require('body-parser'),
   passport = require('passport'),
@@ -17,6 +18,16 @@ const app = express();
 
 // pass passport for configuration
 authentication.configPassport(passport);
+
+//Connect to the MongoDB database
+mongoose.connect(
+  process.env.MONGODB_URI, {
+    useMongoClient: true,
+    reconnectTries: Number.MAX_VALUE,
+    reconnectInterval: 1000
+  }, err => {
+    console.log((err) ? 'Error connecting to the database. ' + err : 'Connected to Database: ' + process.env.MONGODB_URI);
+  });
 
 //Logger
 app.use(morgan('dev'));
