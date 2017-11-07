@@ -19,7 +19,7 @@ mongoose.connect(
     reconnectTries: Number.MAX_VALUE,
     reconnectInterval: 1000
   }, err => {
-    (err) ? errorlog('--SERVER-- Error connecting to the database. ' + err): log('Connected to Database: ' + process.env.MONGODB_URI);
+    (err) ? errorlog('--SERVER-- Error connecting to the database. ' + err): log('--SERVER-- Connected to Database: ' + process.env.MONGODB_URI);
     app = require(path.join(rootPath.toString(), 'app', 'app'));
     /**
      * Get port from environment and store in Express.
