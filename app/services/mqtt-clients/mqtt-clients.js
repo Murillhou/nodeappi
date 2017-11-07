@@ -20,7 +20,7 @@ class Clients {
   newClient(host, port, clientId, user, password) {
     return new Promise((resolve, reject) => {
       try {
-        let opts = require('./mqtt-connect-options');
+        const opts = require('./mqtt-connect-options');
         opts.clientId = clientId;
         if(user && password) {
           opts.user = user;
@@ -33,7 +33,7 @@ class Clients {
             this.clientsStore.deleteClient(clientId);
           }
         }
-        let c = mqtt.connect(host + ':' + port, opts);
+        const c = mqtt.connect(host + ':' + port, opts);
         c.once('connect', () => {
           this.clientsStore.addClient(c);
           return resolve({ msg: 'Client succesfully created and connected.' });

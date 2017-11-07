@@ -3,39 +3,47 @@
 /**
  * Module dependencies.
  */
-
 const http = require('http'),
+  mongoose = require('mongoose'),
   path = require('path'),
-  rootPath = require('app-root-path'),
-  app = require(path.join(rootPath.toString(), 'app', 'app'));
+  rootPath = require('app-root-path').toString(),
+  logging = require(path.join(rootPath, 'app', 'components', 'logging'))('nodeappi'),
+  log = logging.log,
+  errorlog = logging.errorlog;
 
-/**
- * Get port from environment and store in Express.
- */
+var app, port, server;
+//Connect to the MongoDB database
+mongoose.connect(
+  process.env.MONGODB_URI, {
+    useMongoClient: true,
+    reconnectTries: Number.MAX_VALUE,
+    reconnectInterval: 1000
+  }, err => {
+    (err) ? errorlog('--SERVER-- Error connecting to the database. ' + err): log('Connected to Database: ' + process.env.MONGODB_URI);
+    app = require(path.join(rootPath.toString(), 'app', 'app'));
+    /**
+     * Get port from environment and store in Express.
+     */
+    port = normalizePort(process.env.PORT || '5000');
+    app.set('port', port);
+    /**
+     * Create HTTP server.
+     */
+    server = http.createServer(app);
+    /**
+     * Listen on provided port, on all network interfaces.
+     */
+    server.listen(port);
+    server.on('error', onError);
+    server.on('listening', onListening);
+  });
 
-var port = normalizePort(process.env.PORT || '5000');
-app.set('port', port);
-
-/**
- * Create HTTP server.
- */
-
-var server = http.createServer(app);
-
-/**
- * Listen on provided port, on all network interfaces.
- */
-
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
 
 /**
  * Normalize a port into a number, string, or false.
  */
-
 function normalizePort(val) {
-  var port = parseInt(val, 10);
+  const port = parseInt(val, 10);
 
   if(isNaN(port)) {
     // named pipe
@@ -53,24 +61,23 @@ function normalizePort(val) {
 /**
  * Event listener for HTTP server "error" event.
  */
-
 function onError(error) {
   if(error.syscall !== 'listen') {
     throw error;
   }
 
-  var bind = typeof port === 'string' ?
+  const bind = typeof port === 'string' ?
     'Pipe ' + port :
     'Port ' + port;
 
   // handle specific listen errors with friendly messages
   switch(error.code) {
     case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
+      errorlog('--SERVER-- ' + bind + ' requires elevated privileges');
       process.exit(1);
       break;
     case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
+      errorlog('--SERVER-- ' + bind + ' is already in use');
       process.exit(1);
       break;
     default:
@@ -81,11 +88,10 @@ function onError(error) {
 /**
  * Event listener for HTTP server "listening" event.
  */
-
 function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string' ?
+  const addr = server.address();
+  const bind = typeof addr === 'string' ?
     'pipe ' + addr :
     'port ' + addr.port;
-  console.log('Listening on ' + bind);
+  log('--SERVER-- Listening on ' + bind);
 }

@@ -11,6 +11,7 @@
   "author": "Murillhou",
   "license": "MIT",
   "dependencies": {
+    "acl": "^0.4.11",
     "app-root-path": "2.0.1",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "1.18.2",

@@ -25,7 +25,13 @@ module.exports = name => {
     ]
   });
   return {
-    error: err => logger.error(err),
-    log: msg => logger.info(msg)
-  }
+    error: (err, ...rest) => {
+      logger.error(err, rest.length ? rest.join() : '');
+      console.log(' ' + name + '-' + Date.now() + ': ', err, rest.length ? rest.join() : '');
+    },
+    log: (msg, ...rest) => {
+      logger.info(msg, rest.length ? rest.join() : '');
+      console.log(' ' + name + '-' + Date.now() + ': ', msg, rest.length ? rest.join() : '');
+    }
+  };
 };

@@ -1,15 +1,16 @@
-/**
- * http://usejsdoc.org/
- */
-
-/* jshint loopfunc:true */
 // LOAD REQUIRED PACKAGES
-var lo = require('lodash'),
-  jwt = require('jwt-simple');
+const _ = require('lodash'),
+  jwt = require('jwt-simple'),
+  path = require('path'),
+  rootPath = require('app-root-path').toString(),
+  authFunctions = require(path.join(rootPath, 'app', 'components', 'authentication')).functions;
 // LOAD REQUIRED MODULES OR CLASSES
-var usermcf = require('./usercontroller.functions')('./model', 'user');
+const usermcf = require('./usercontroller.functions')('../model', 'user');
+const emitUpdateEvent = (model, upd, ...rest) =>
+  require(path.join(rootPath, 'app', 'components', 'event-manager'))
+  .emit('userupdate', model, upd, rest);
 
-const mapAssign = entry => objarray => objarray.map(obj => lo.assign(obj, entry));
+// const mapAssign = entry => objarray => objarray.map(obj => _.assign(obj, entry));
 
 // AUX USER MANAGEMENT FUNCTIONS
 const authenticateUser = (req, res) =>
@@ -22,7 +23,7 @@ const authenticateUser = (req, res) =>
       user.comparePassword(req.body.password, function(err, isMatch) {
         if(isMatch && !err) {
           // if user is found and password is right create a token
-          var token = jwt.encode(user, process.env.authenticationSecret);
+          const token = authFunctions.buildToken(user);
           // return the information including token as JSON
           res.status(200).send({ success: true, token: 'JWT ' + token });
         } else {
@@ -55,11 +56,11 @@ const saveNew = userobject =>
     // if(!(userobject._client)) {
     //   return reject('User and client IDs must be specified!');
     // } else {
-    let newuser = usermcf.extended({})(lo.omit(userobject, ['_id']));
+    const newuser = usermcf.extended({})(_.omit(userobject, ['_id']));
     usermcf.save(newuser)
       .then(result => {
-        //emitUpdateEvent(null, lo.omit(result, '_doc.password'));
-        return resolve(lo.omit(result, '_doc.password'));
+        emitUpdateEvent(null, _.omit(result, '_doc.password'));
+        return resolve(_.omit(result, '_doc.password'));
       })
       .catch(error => {
         return reject(error);
@@ -74,9 +75,9 @@ const updateExisting = (query, userobj) =>
       if(!user) {
         return reject('Cannot find the speciffied user!');
       }
-      usermcf.findOneAndUpdate(lo.pick(user._doc, '_id'))(lo.omit(userobj, ['_id', 'type']))
+      usermcf.findOneAndUpdate(_.pick(user._doc, '_id'))(_.omit(userobj, ['_id', 'type']))
         .then(result => {
-          //emitUpdateEvent(user, result);
+          emitUpdateEvent(user, result);
           return resolve(result);
         })
         .catch(error => {
@@ -100,7 +101,7 @@ const deleteExisting = (query) =>
         // } else {
         usermcf.findOneAndDelete({ _id: user._id })
           .then(result => {
-            //emitUpdateEvent(user, null);
+            emitUpdateEvent(user, null);
             return resolve(result);
           })
           .catch(error =>
@@ -114,10 +115,10 @@ const deleteExisting = (query) =>
  */
 const postUser = userobject =>
   new Promise((resolve, reject) =>
-    usermcf.findOne(lo.pick(userobject, ['username']))
+    usermcf.findOne(_.pick(userobject, ['username']))
     .then(user => {
       if(user) {
-        return updateExisting(lo.pick(user._doc, '_id'), user);
+        return updateExisting(_.pick(user._doc, '_id'), user);
       } else {
         return saveNew(userobject);
       }
@@ -169,7 +170,7 @@ const postUsersREST = (req, res) => {
     .then(result => {
       res.status(200).send({ success: true, msg: 'Userss succesfully posted', data: result });
     }, error => {
-      res.status(500).send({ success: false, msg: error, err: error });
+      res.status(500).send({ success: false, msg: error.message, err: error });
     });
 };
 /**
@@ -181,7 +182,7 @@ const getUserREST = (req, res) => {
   getUser({ _id: req.params._user })
     .then(result =>
       res.status(result ? 200 : 400)
-      .send(result ? { success: true, data: lo.omit(result._doc, 'password') } : { success: false, msg: 'Can´t find the specified user.' })
+      .send(result ? { success: true, data: _.omit(result._doc, 'password') } : { success: false, msg: 'Can´t find the specified user.' })
     )
     .catch(error => res.status(500).send({ success: false, msg: error, err: error }));
 };
@@ -193,7 +194,7 @@ const getUserREST = (req, res) => {
 const getUsersREST = (req, res) => {
   getUsers(req.query)
     .then(results =>
-      res.status(200).send(results ? { success: true, data: results.map(r => lo.omit(r._doc, 'password')) } : { success: true, msg: 'Can´t find any users.' }))
+      res.status(200).send(results ? { success: true, data: results.map(r => _.omit(r._doc, 'password')) } : { success: true, msg: 'Can´t find any users.' }))
     .catch(error =>
       res.status(500).send({ success: false, msg: 'Failed while trying to get the users.', err: error }));
 };

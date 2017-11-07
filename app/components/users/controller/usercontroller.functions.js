@@ -6,7 +6,7 @@ const createSchemaModelExtended = sp => sn => model => obj => {
   if(!(obj)) {
     return null;
   }
-  let res = lo.entries(model).length ? lo.clone(model) : new(rs(sp, sn))();
+  const res = lo.entries(model).length ? lo.clone(model) : new(rs(sp, sn))();
   rs(sp, sn).schema.eachPath(path => {
     if(lo.has(obj, path) && !lo.has(res, path)) {
       res[path] = obj[path];

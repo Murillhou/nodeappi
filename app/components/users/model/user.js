@@ -1,12 +1,16 @@
 /**
  * http://usejsdoc.org/
  */
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
-var bcrypt = require('bcrypt-nodejs');
+const mongoose = require('mongoose'),
+  bcrypt = require('bcrypt-nodejs'),
+  Schema = mongoose.Schema;
 
 // set up a mongoose model
-var UserSchema = new Schema({
+const UserSchema = new Schema({
+  usertype: {
+    type: Array,
+    required: true
+  },
   username: {
     type: String,
     required: true,
@@ -19,7 +23,7 @@ var UserSchema = new Schema({
 });
 
 UserSchema.pre('save', function(next) {
-  var user = this;
+  const user = this;
   if(this.isModified('password') || this.isNew) {
     bcrypt.genSalt(10, function(err, salt) {
       if(err) {
@@ -39,7 +43,7 @@ UserSchema.pre('save', function(next) {
 });
 
 UserSchema.pre('update', function(next) {
-  var upd = this.getUpdate();
+  const upd = this.getUpdate();
   if(upd.$set.password) {
     bcrypt.genSalt(10, function(err, salt) {
       if(err) {

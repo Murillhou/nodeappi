@@ -1,5 +1,5 @@
 const model = require('./model'),
-  controller = require('./usercontroller');
+  controller = require('./controller');
 module.exports = {
   controller,
   model
