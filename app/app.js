@@ -14,7 +14,7 @@ const logging = require(path.join(rootPath, 'app', 'components', 'logging'))('no
   errorMidd = require(path.join(__dirname, 'middlewares')).errors,
   authentication = require(path.join(__dirname, 'components', 'authentication')),
   routes = require(path.join(__dirname, 'routes')),
-  static = require(path.join(__dirname, 'static'));
+  static = require(path.join(__dirname, 'routes', 'static'));
 
 // Initialize express app
 const app = express();
