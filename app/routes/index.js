@@ -9,11 +9,10 @@ const express = require('express'),
 
 router.post('/authenticate', require('./authenticate'));
 
-router.post('/users',
-  /*[
-     passport.authenticate('jwt', { session: false }),
-     acl.middleware(2, getUserName, 'post')
-   ],*/
+router.post('/users', [
+    passport.authenticate('jwt', { session: false }),
+    acl.middleware(2, getUserName, 'post')
+  ],
   require('./post-users'));
 
 router.use('/mqtt', require('./mqtt'));

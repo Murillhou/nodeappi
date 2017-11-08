@@ -29,9 +29,10 @@ const userCreated = u =>
           acl.allow([{
             roles: ['admin_role'],
             allows: [
-              { resources: '/api/users/', permissions: '*' },
-              { resources: '/api/mqtt/', permissions: '*' },
-              { resources: '/api/slack/', permissions: '*' }
+              { resources: '/api/users', permissions: '*' },
+              { resources: '/api/users', permissions: '*' },
+              { resources: '/api/mqtt', permissions: '*' },
+              { resources: '/api/slack', permissions: '*' }
             ]
           }]);
           break;
@@ -39,8 +40,8 @@ const userCreated = u =>
           acl.allow([{
             roles: [u.username + '_role'],
             allows: [
-              { resources: '/api/mqtt/', permissions: ['get'] },
-              { resources: '/api/slack/', permissions: ['get'] }
+              { resources: '/api/mqtt', permissions: ['get'] },
+              { resources: '/api/slack', permissions: ['get'] }
             ]
           }]);
           break;
@@ -48,8 +49,8 @@ const userCreated = u =>
           acl.allow([{
             roles: [u.username + '_role'],
             allows: [
-              { resources: '/api/mqtt/', permissions: ['get', 'post'] },
-              { resources: '/api/slack/', permissions: ['get', 'post'] }
+              { resources: '/api/mqtt', permissions: ['get', 'post'] },
+              { resources: '/api/slack', permissions: ['get', 'post'] }
             ]
           }]);
           break;
