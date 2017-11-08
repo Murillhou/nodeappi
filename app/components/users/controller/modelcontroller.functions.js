@@ -1,4 +1,4 @@
-const lo = require('lodash');
+const _ = require('lodash');
 
 const rs = (schemasPath, schemaName) => require((schemasPath.slice(-1) === '/' ? schemasPath : schemasPath + '/') + schemaName);
 
@@ -6,9 +6,9 @@ const createSchemaModelExtended = sp => sn => model => obj => {
   if(!(obj)) {
     return null;
   }
-  const res = lo.entries(model).length ? lo.clone(model) : new(rs(sp, sn))();
+  const res = _.entries(model).length ? _.clone(model) : new(rs(sp, sn))();
   rs(sp, sn).schema.eachPath(path => {
-    if(lo.has(obj, path) && !lo.has(res, path)) {
+    if(_.has(obj, path) && !_.has(res, path)) {
       res[path] = obj[path];
     }
   });
@@ -26,7 +26,7 @@ const createSchemaFind = sp => sn => query =>
   );
 const createSchemaFindOne = sp => sn => query =>
   new Promise((resolve, reject) =>
-    lo.entries(query).length ?
+    _.entries(query).length ?
     rs(sp, sn)
     .findOne(query, (err, model) =>
       err ? reject(err) : (model ? resolve(model) : resolve(null))) :
@@ -41,31 +41,15 @@ const createSchemaFindOneAndDelete = sp => sn => query =>
   new Promise((resolve, reject) =>
     rs(sp, sn).findOneAndRemove(query, {}, (err, item) => err ? reject(err) : resolve(item))
   );
-const createSchemaFindOnePopulate = sp => sn => query => paths =>
-  new Promise((resolve, reject) =>
-    lo.entries(query).length ?
-    rs(sp, sn)
-    .findOne(query)
-    .populate(paths)
-    .exec((err, doc) => err ? reject(err) : resolve(doc)) :
-    reject('Empty query!')
-  );
-const createSchemaFindPopulate = sp => sn => query => paths =>
-  new Promise((resolve, reject) =>
-    rs(sp, sn)
-    .find(query)
-    .populate(paths)
-    .exec((err, item) => err ? reject(err) : resolve(item))
-  );
 const createSchemaReplace = sp => sn => query => model =>
   new Promise((resolve, reject) =>
-    (query && model && lo.entries(query).length && lo.entries(model).length) ?
+    (query && model && _.entries(query).length && _.entries(model).length) ?
     rs(sp, sn).replaceOne(query, model, (err, result) => err ? reject(err) : resolve(result)) :
     reject('Bad arguments!')
   );
-const createSchemaSave = sp => sn => model =>
+const createSave = model =>
   new Promise((resolve, reject) => {
-    if((model && lo.entries(model).length)) {
+    if((model && _.entries(model).length)) {
       model.save((err, res) => {
         return err ? reject(err) : resolve(res);
       });
@@ -75,7 +59,7 @@ const createSchemaSave = sp => sn => model =>
   });
 const createSchemaUpdate = sp => sn => query => model =>
   new Promise((resolve, reject) => {
-    if(query && model && lo.entries(query).length && lo.entries(model).length) {
+    if(query && model && _.entries(query).length && _.entries(model).length) {
       rs(sp, sn).update(query, model, { multi: true }, (err, result) => {
         if(err) {
           return reject(err);
@@ -88,18 +72,14 @@ const createSchemaUpdate = sp => sn => query => model =>
     }
   });
 
-module.exports = (sp, sn) => {
-  return {
-    deleteOne: createSchemaDeleteOne(sp)(sn),
-    extended: createSchemaModelExtended(sp)(sn),
-    find: createSchemaFind(sp)(sn),
-    findOne: createSchemaFindOne(sp)(sn),
-    findOneAndUpdate: createSchemaFindOneAndUpdate(sp)(sn),
-    findOneAndDelete: createSchemaFindOneAndDelete(sp)(sn),
-    findOnePopulate: createSchemaFindOnePopulate(sp)(sn),
-    findPopulate: createSchemaFindPopulate(sp)(sn),
-    replace: createSchemaReplace(sp)(sn),
-    save: createSchemaSave(sp)(sn),
-    update: createSchemaUpdate(sp)(sn)
-  };
-};
+module.exports = (sp, sn) => ({
+  deleteOne: createSchemaDeleteOne(sp)(sn),
+  extended: createSchemaModelExtended(sp)(sn),
+  find: createSchemaFind(sp)(sn),
+  findOne: createSchemaFindOne(sp)(sn),
+  findOneAndUpdate: createSchemaFindOneAndUpdate(sp)(sn),
+  findOneAndDelete: createSchemaFindOneAndDelete(sp)(sn),
+  replace: createSchemaReplace(sp)(sn),
+  save: createSave,
+  update: createSchemaUpdate(sp)(sn)
+});

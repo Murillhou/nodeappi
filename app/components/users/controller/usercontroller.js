@@ -1,11 +1,10 @@
 // LOAD REQUIRED PACKAGES
 const _ = require('lodash'),
-  jwt = require('jwt-simple'),
   path = require('path'),
   rootPath = require('app-root-path').toString(),
   authFunctions = require(path.join(rootPath, 'app', 'components', 'authentication')).functions;
 // LOAD REQUIRED MODULES OR CLASSES
-const usermcf = require('./usercontroller.functions')('../model', 'user');
+const usermcf = require('./modelcontroller.functions')('../model', 'user');
 const emitUpdateEvent = (model, upd, ...rest) =>
   require(path.join(rootPath, 'app', 'components', 'event-manager'))
   .emit('userupdate', model, upd, rest);
@@ -52,21 +51,15 @@ const getUsers = query =>
     })
   );
 const saveNew = userobject =>
-  new Promise((resolve, reject) => {
-    // if(!(userobject._client)) {
-    //   return reject('User and client IDs must be specified!');
-    // } else {
-    const newuser = usermcf.extended({})(_.omit(userobject, ['_id']));
-    usermcf.save(newuser)
-      .then(result => {
-        emitUpdateEvent(null, _.omit(result, '_doc.password'));
-        return resolve(_.omit(result, '_doc.password'));
-      })
-      .catch(error => {
-        return reject(error);
-      });
-    // }
-  });
+  new Promise((resolve, reject) =>
+    usermcf.save(usermcf.extended({})(_.omit(userobject, ['_id'])))
+    .then(result => {
+      emitUpdateEvent(null, _.omit(result, '_doc.password'));
+      resolve(_.omit(result, '_doc.password'));
+    })
+    .catch(error => {
+      reject(error);
+    }));
 
 const updateExisting = (query, userobj) =>
   new Promise((resolve, reject) =>
@@ -84,9 +77,7 @@ const updateExisting = (query, userobj) =>
           return reject(error);
         });
     })
-    .catch(error => {
-      return reject(error);
-    })
+    .catch(error => reject(error))
   );
 
 const deleteExisting = (query) =>
@@ -96,17 +87,14 @@ const deleteExisting = (query) =>
         if(!user) {
           return reject('Cannot find the specified user!');
         }
-        // if(!user._client) {
-        //   return reject('A client must be specified!');
-        // } else {
         usermcf.findOneAndDelete({ _id: user._id })
           .then(result => {
             emitUpdateEvent(user, null);
             return resolve(result);
           })
-          .catch(error =>
-            reject(error));
-        // }
+          .catch(error => {
+            return reject(error);
+          });
       });
   });
 /**
@@ -167,25 +155,29 @@ const postUsersFilter = (req, res, next) => {
  */
 const postUsersREST = (req, res) => {
   postUsers(req.body)
-    .then(result => {
-      res.status(200).send({ success: true, msg: 'Userss succesfully posted', data: result });
-    }, error => {
-      res.status(500).send({ success: false, msg: error.message, err: error });
-    });
+    .then(result => res.status(200).send({
+      success: true,
+      msg: 'Userss succesfully posted',
+      data: result
+    }))
+    .catch(error => res.status(500).send({
+      success: false,
+      msg: error.message,
+      err: error
+    }));
 };
 /**
  * Express endpoint for GET on /api/users/:_user acces point route.
  * @param {Request} req 
  * @param {Response} res
  */
-const getUserREST = (req, res) => {
+const getUserREST = (req, res) =>
   getUser({ _id: req.params._user })
-    .then(result =>
-      res.status(result ? 200 : 400)
-      .send(result ? { success: true, data: _.omit(result._doc, 'password') } : { success: false, msg: 'Can´t find the specified user.' })
-    )
-    .catch(error => res.status(500).send({ success: false, msg: error, err: error }));
-};
+  .then(result => res.status(result ? 200 : 400).send(
+    result ? { success: true, data: _.omit(result._doc, 'password') } : { success: false, msg: 'Can´t find the specified user.' }
+  ))
+  .catch(error => res.status(500).send({ success: false, msg: error, err: error }));
+
 /**
  * Express endpoint for GET on /api/users access point route.
  * @param {Request} req 
@@ -194,7 +186,8 @@ const getUserREST = (req, res) => {
 const getUsersREST = (req, res) => {
   getUsers(req.query)
     .then(results =>
-      res.status(200).send(results ? { success: true, data: results.map(r => _.omit(r._doc, 'password')) } : { success: true, msg: 'Can´t find any users.' }))
+      res.status(200).send(
+        results ? { success: true, data: results.map(r => _.omit(r._doc, 'password')) } : { success: true, msg: 'Can´t find any users.' }))
     .catch(error =>
       res.status(500).send({ success: false, msg: 'Failed while trying to get the users.', err: error }));
 };

@@ -1,4 +1,8 @@
 const Clients = require('./mqtt-clients'),
+  chai = require('chai'),
+  chaiAsPromised = require("chai-as-promised"),
+  should = chai.should(),
+  expect = chai.expect,
   util = require('util');
 
 describe('MqttClients', () => {
