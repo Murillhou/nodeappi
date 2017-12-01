@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+if(!process.env.node_env || !process.env.node_env.includes('debug')) {
+  require('dotenv').config();
+}
 /**
  * Module dependencies.
  */
@@ -9,7 +12,7 @@ const http = require('http'),
   rootPath = require('app-root-path').toString(),
   logging = require(path.join(rootPath, 'app', 'components', 'logging'))('nodeappi'),
   log = logging.log,
-  errorlog = logging.errorlog;
+  errorlog = logging.error;
 
 var app, port, server;
 //Connect to the MongoDB database
@@ -19,7 +22,7 @@ mongoose.connect(
     reconnectTries: Number.MAX_VALUE,
     reconnectInterval: 1000
   }, err => {
-    (err) ? errorlog('--SERVER-- Error connecting to the database. ' + err): log('--SERVER-- Connected to Database: ' + process.env.MONGODB_URI);
+    (err) ? errorlog('Error connecting to the database. ' + err): log('Connected to Database: ' + process.env.MONGODB_URI);
     app = require(path.join(rootPath.toString(), 'app', 'app'));
     /**
      * Get port from environment and store in Express.
@@ -73,11 +76,11 @@ function onError(error) {
   // handle specific listen errors with friendly messages
   switch(error.code) {
     case 'EACCES':
-      errorlog('--SERVER-- ' + bind + ' requires elevated privileges');
+      errorlog(bind + ' requires elevated privileges');
       process.exit(1);
       break;
     case 'EADDRINUSE':
-      errorlog('--SERVER-- ' + bind + ' is already in use');
+      errorlog(bind + ' is already in use');
       process.exit(1);
       break;
     default:
@@ -93,5 +96,5 @@ function onListening() {
   const bind = typeof addr === 'string' ?
     'pipe ' + addr :
     'port ' + addr.port;
-  log('--SERVER-- Listening on ' + bind);
+  log('Listening on ' + bind);
 }

@@ -16,7 +16,7 @@ const authenticateUser = (req, res) =>
   usermcf.findOne({ username: req.body.username })
   .then(user => {
     if(!user) {
-      res.status(400).send({ success: false, msg: 'User not found.' });
+      res.status(400).send({ success: false, message: 'User not found.' });
     } else {
       // check if password matches
       user.comparePassword(req.body.password, function(err, isMatch) {
@@ -26,7 +26,7 @@ const authenticateUser = (req, res) =>
           // return the information including token as JSON
           res.status(200).send({ success: true, token: 'JWT ' + token });
         } else {
-          res.status(400).send({ success: false, msg: 'Authentication failed. Wrong password.' });
+          res.status(400).send({ success: false, message: 'Authentication failed. Wrong password.' });
         }
       });
     }
@@ -43,22 +43,19 @@ const getUser = query =>
 const getUsers = query =>
   new Promise((resolve, reject) =>
     usermcf.find(query)
-    .then(founduu => {
-      resolve(founduu ? founduu : null);
-    })
-    .catch(error => {
-      reject(error);
-    })
+    .then(founduu => resolve(founduu ? founduu : null))
+    .catch(error => reject(error))
   );
 const saveNew = userobject =>
   new Promise((resolve, reject) =>
     usermcf.save(usermcf.extended({})(_.omit(userobject, ['_id'])))
     .then(result => {
-      emitUpdateEvent(null, _.omit(result, '_doc.password'));
-      resolve(_.omit(result, '_doc.password'));
+      let resObj = _.omit(result._doc, ['_id', 'password']);
+      emitUpdateEvent(null, resObj);
+      return resolve(resObj);
     })
     .catch(error => {
-      reject(error);
+      return reject(error);
     }));
 
 const updateExisting = (query, userobj) =>
@@ -68,10 +65,11 @@ const updateExisting = (query, userobj) =>
       if(!user) {
         return reject('Cannot find the speciffied user!');
       }
-      usermcf.findOneAndUpdate(_.pick(user._doc, '_id'))(_.omit(userobj, ['_id', 'type']))
+      usermcf.findOneAndUpdate(_.pick(user._doc, '_id'))(_.omit(userobj.doc, ['_id', 'usertype']))
         .then(result => {
-          emitUpdateEvent(user, result);
-          return resolve(result);
+          let resObj = _.omit(result._doc, ['_id', 'password']);
+          emitUpdateEvent(user, resObj);
+          return resolve(resObj);
         })
         .catch(error => {
           return reject(error);
@@ -132,14 +130,14 @@ const postUsersFilter = (req, res, next) => {
   if(!(req.body).length) {
     res.status(500).send({
       success: false,
-      msg: 'Nothing inserted, 0 users in POST body',
+      message: 'Nothing inserted, 0 users in POST body',
       err: 'Nothing inserted, 0 users in POST body'
     });
   } else {
     // if(!req.params._client) {
     //   res.status(500).send({
     //     success: false,
-    //     msg: 'Nothing inserted, no client specified.',
+    //     message: 'Nothing inserted, no client specified.',
     //     err: 'Nothing inserted, no client specified.'
     //   });
     // } else {
@@ -157,12 +155,12 @@ const postUsersREST = (req, res) => {
   postUsers(req.body)
     .then(result => res.status(200).send({
       success: true,
-      msg: 'Userss succesfully posted',
+      message: 'Userss succesfully posted',
       data: result
     }))
     .catch(error => res.status(500).send({
       success: false,
-      msg: error.message,
+      message: error.message,
       err: error
     }));
 };
@@ -174,9 +172,9 @@ const postUsersREST = (req, res) => {
 const getUserREST = (req, res) =>
   getUser({ _id: req.params._user })
   .then(result => res.status(result ? 200 : 400).send(
-    result ? { success: true, data: _.omit(result._doc, 'password') } : { success: false, msg: 'Can´t find the specified user.' }
+    result ? { success: true, data: _.omit(result._doc, 'password') } : { success: false, message: 'Can´t find the specified user.' }
   ))
-  .catch(error => res.status(500).send({ success: false, msg: error, err: error }));
+  .catch(error => res.status(500).send({ success: false, message: error, err: error }));
 
 /**
  * Express endpoint for GET on /api/users access point route.
@@ -187,9 +185,9 @@ const getUsersREST = (req, res) => {
   getUsers(req.query)
     .then(results =>
       res.status(200).send(
-        results ? { success: true, data: results.map(r => _.omit(r._doc, 'password')) } : { success: true, msg: 'Can´t find any users.' }))
+        results ? { success: true, data: results.map(r => _.omit(r._doc, 'password')) } : { success: true, message: 'Can´t find any users.' }))
     .catch(error =>
-      res.status(500).send({ success: false, msg: 'Failed while trying to get the users.', err: error }));
+      res.status(500).send({ success: false, message: 'Failed while trying to get the users.', err: error }));
 };
 /**
  * Express endpoints for DELETE on /clients/:_client/users/:_user and /users/:_user access points routes.
@@ -199,9 +197,9 @@ const getUsersREST = (req, res) => {
 const deleteUserREST = (req, res) => {
   deleteExisting({ _id: req.params._user })
     .then(result =>
-      res.status(result ? 200 : 400).send(result ? { success: true, msg: 'User deleted.' } : { success: false, msg: 'User not found.' }))
+      res.status(result ? 200 : 400).send(result ? { success: true, message: 'User deleted.' } : { success: false, message: 'User not found.' }))
     .catch(error =>
-      res.status(500).send({ success: false, msg: 'Failed while trying to delete the user.', err: error }));
+      res.status(500).send({ success: false, message: 'Failed while trying to delete the user.', err: error }));
 };
 
 module.exports = {

@@ -1,6 +1,5 @@
 // Required files, libraries and modules
 const express = require('express'),
-  morgan = require('morgan'),
   bodyParser = require('body-parser'),
   passport = require('passport'),
   cors = require('cors'),
@@ -8,10 +7,7 @@ const express = require('express'),
   path = require('path'),
   rootPath = require('app-root-path').toString();
 
-const logging = require(path.join(rootPath, 'app', 'components', 'logging'))('nodeappi'),
-  log = logging.log,
-  errorlog = logging.errorlog,
-  errorMidd = require(path.join(__dirname, 'middlewares')).errors,
+const errorMidd = require(path.join(__dirname, 'middlewares')).errors,
   authentication = require(path.join(__dirname, 'components', 'authentication')),
   routes = require(path.join(__dirname, 'routes')),
   static = require(path.join(__dirname, 'routes', 'static'));
@@ -22,20 +18,12 @@ const app = express();
 // pass passport for configuration
 authentication.configPassport(passport);
 
-//Logger
-app.use(morgan('dev'));
-
 // Apply middlewares (ensure order)
 app.use(cors());
 app.use(helmet());
 app.use(passport.initialize());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-//Ensure valid origin, initialize locals and find logged in user
-// app.use(initLocals);
-// app.use(ensureValidOrigin);
-// app.use(authenticate);
 
 // Mount routes 
 app.use('/api', routes);
@@ -48,8 +36,6 @@ app.use(express.static('public'));
 app.use(static);
 
 // Handle errors
-app.get(errorMidd.errorHandler);
-app.get(errorMidd.catch404);
-
+app.get(errorMidd);
 
 module.exports = app;

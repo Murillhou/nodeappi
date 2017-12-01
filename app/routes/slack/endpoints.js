@@ -1,6 +1,6 @@
 const path = require('path'),
   rootPath = require('app-root-path').toString(),
-  logging = require(path.join(rootPath, 'app', 'components', 'logging'))('nodeappi'),
+  logging = require(path.join(rootPath, 'app', 'components', 'logging'))('nodeappi_routes_slack'),
   log = logging.log,
   errorlog = logging.errorlog,
   getUserName = require(path.join(rootPath.toString(), 'app', 'components', 'authentication'))
@@ -13,18 +13,18 @@ const getPostMessageEndpoint = slackBot => (req, res) => {
       getUserName(req, res) +
       ')\n  ' + req.body.message)
     .then(result => {
-      log('--SLACKBOT-- ' + result.message.text);
+      log(result.message.text);
       return res.status(result.ok ? 200 : 500).send({
         success: result.ok,
-        msg: result.ok ?
+        message: result.ok ?
           'Message was succesfully posted' : 'Error while trying to post the message.'
       });
     })
     .catch(error => {
-      errorlog('--SLACKBOT-- ' + error.message);
+      errorlog(error.message);
       return res.status(500).send({
         success: false,
-        msg: 'Error while trying to post the message.',
+        message: 'Error while trying to post the message.',
         err: error
       });
     });

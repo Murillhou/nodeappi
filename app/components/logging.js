@@ -1,39 +1,59 @@
-const fs = require('fs'),
-  bunyan = require('bunyan'),
+const bunyan = require('bunyan'),
+  fs = require('fs'),
   PrettyStream = require('bunyan-prettystream');
 
 module.exports = name => {
-  // const prettyFile = new PrettyStream();
-  // prettyFile.pipe(fs.createWriteStream(`/var/log/pretty_${name}_log.json`));
-  // const prettyStdOut = new PrettyStream();
-  // prettyStdOut.pipe(process.stdout);
+  const prettyFile = new PrettyStream();
+  prettyFile.pipe(fs.createWriteStream(`/var/log/pretty_${name}_log.json`));
+  const prettyStdOut = new PrettyStream();
+  prettyStdOut.pipe(process.stdout);
+  const streams = [];
+  for(let l of process.env.loggers) {
+    switch(l) {
+      case('file'):
+        streams.push({
+          level: 'info',
+          stream: fs.createWriteStream(`/var/log/${name}_log.json`)
+        });
+        break;
+      case('prettyFile'):
+        streams.push({
+          level: 'info',
+          stream: prettyFile,
+        });
+        break;
+      case('stdout'):
+        streams.push({
+          level: 'info',
+          stream: process.stdout
+        });
+        break;
+      case('prettyStdout'):
+        streams.push({
+          level: 'info',
+          stream: prettyStdOut
+        });
+        break;
+    }
+  }
+
   const logger = bunyan.createLogger({
     name,
     type: 'raw',
-    streams: [
-      // {
-      //   level: 'info',
-      //   stream: prettyFile,
-      // },
-      // {
-      //   level: 'info',
-      //   stream: fs.createWriteStream(`/var/log/${name}_log.json`)
-      // },
-      {
-        level: 'info',
-        stream: process.stdout
-          //stream: prettyStdOut
-      }
-    ]
+    streams
   });
   return {
     error: (err, ...rest) => {
       logger.error(err, rest.length ? rest.join() : '');
-      //console.log(' ' + name + '-' + Date.now() + ': ', err, rest.length ? rest.join() : '');
+      if(process.env.node_env && process.env.node_env.includes('debug')) {
+        console.log(' ' + name + '-' + Date.now() + ': ', err, rest.length ? rest.join() : '');
+      }
     },
     log: (msg, ...rest) => {
       logger.info(msg, rest.length ? rest.join() : '');
-      //console.log(' ' + name + '-' + Date.now() + ': ', msg, rest.length ? rest.join() : '');
+      if(process.env.node_env && process.env.node_env.includes('debug')) {
+        console.log(' ' + name + '-' + Date.now() + ': ', msg, rest.length ? rest.join() : '');
+      }
     }
   };
 };

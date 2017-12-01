@@ -9,7 +9,7 @@ module.exports = (req, res) =>
         Authentication: 'JWT',
         description: 'Allows an authenticated user to post message on the configured Murillhou slack channel.',
         request: '{message: String}',
-        response: '{succes: boolean, msg: String}'
+        response: '{succes: boolean, message: String}'
       }]
     }
   });

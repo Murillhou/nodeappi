@@ -9,12 +9,11 @@ const mongoose = require('mongoose'),
   NodeACL = require('acl'),
   path = require('path'),
   rootPath = require('app-root-path').toString(),
-  logging = require(path.join(rootPath, 'app', 'components', 'logging'))('nodeappi'),
-  log = logging.log,
-  errorlog = logging.errorlog;
+  logging = require(path.join(rootPath, 'app', 'components', 'logging'))('nodeappi_components_acl'),
+  log = logging.log;
 
 // Generic debug logger for NodeACL
-const logger = () => ({ debug: function(msg) { log('--ACL DEBUG--', msg); } });
+const logger = () => ({ debug: function(msg) { log(msg); } });
 // Create a new access control list by providing the mongo backend
 const mongoBackend = new NodeACL.mongodbBackend(mongoose.connection.db, '_acl');
 const acl = new NodeACL(mongoBackend, logger());

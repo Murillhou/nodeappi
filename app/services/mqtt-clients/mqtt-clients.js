@@ -28,7 +28,7 @@ class Clients {
         }
         if(this.clientsStore.getClient(clientId)) {
           if(this.clientsStore.getClient(clientId).connected) {
-            return resolve({ msg: 'Specified client already exists.' });
+            return resolve({ message: 'Specified client already exists.' });
           } else {
             this.clientsStore.deleteClient(clientId);
           }
@@ -36,12 +36,12 @@ class Clients {
         const c = mqtt.connect(host + ':' + port, opts);
         c.once('connect', () => {
           this.clientsStore.addClient(c);
-          return resolve({ msg: 'Client succesfully created and connected.' });
+          return resolve({ message: 'Client succesfully created and connected.' });
         });
-        setTimeout(() => reject({ msg: 'Timeout while trying to conect the new client.' }), 10000);
+        setTimeout(() => reject({ message: 'Timeout while trying to conect the new client.' }), 10000);
       } catch(exception) {
         return reject({
-          msg: 'Error while trying to create and conect a new client.',
+          message: 'Error while trying to create and conect a new client.',
           err: exception
         });
       }
@@ -63,9 +63,9 @@ class Clients {
     return new Promise((resolve, reject) => {
       this.clientsStore.getClient(clientId).publish(topic, payload, { qos, retain }, error => {
         if(error) {
-          return reject({ msg: 'Error publishing.', err: error });
+          return reject({ message: 'Error publishing.', err: error });
         }
-        return resolve({ msg: 'Succesfully published.' });
+        return resolve({ message: 'Succesfully published.' });
       });
     });
   }
@@ -73,9 +73,9 @@ class Clients {
     return new Promise((resolve, reject) => {
       this.clientsStore.getClient(clientId).subscribe(topics, { qos: 1 }, error => {
         if(error) {
-          return reject({ msg: 'Error subscribing', err: error });
+          return reject({ message: 'Error subscribing', err: error });
         }
-        return resolve({ msg: 'Succesfully subscribed.' });
+        return resolve({ message: 'Succesfully subscribed.' });
       });
     });
   }
@@ -83,9 +83,9 @@ class Clients {
     return new Promise((resolve, reject) => {
       this.clientsStore.getClient(clientId).unsubscribe(topics, error => {
         if(error) {
-          return reject({ msg: 'Error unsubscribing', err: error });
+          return reject({ message: 'Error unsubscribing', err: error });
         }
-        return resolve({ msg: 'Succesfully unsubscribed.' });
+        return resolve({ message: 'Succesfully unsubscribed.' });
       });
     });
   }

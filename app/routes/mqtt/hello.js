@@ -9,7 +9,7 @@ module.exports = (req, res) =>
         Authentication: 'JWT',
         description: 'Allows an authenticated user to publish a MQTT message on the configured broker.',
         request: '{topic: String, message: String}',
-        response: '{succes: boolean, msg: String}'
+        response: '{succes: boolean, message: String}'
       }]
     }
   });
