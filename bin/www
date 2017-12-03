@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 
-if(!process.env.node_env || !process.env.node_env.includes('debug')) {
-  require('dotenv').config();
+if(!process.env.node_env || process.env.node_env.includes('debug')) {
+  require('dotenv').config({ path: 'www.env' });
+}
+if(!process.env.MONGODB_URI || !process.env.PORT) {
+  throw new Error('Missing environment variables: MONGODB_URI, PORT');
 }
 /**
  * Module dependencies.

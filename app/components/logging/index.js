@@ -1,3 +1,7 @@
+if(!process.env.loggers) {
+  throw new Error('Missing environment variables: loggers');
+}
+
 const bunyan = require('bunyan'),
   fs = require('fs'),
   PrettyStream = require('bunyan-prettystream');
