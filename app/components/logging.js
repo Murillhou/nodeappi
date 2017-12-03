@@ -3,12 +3,8 @@ const bunyan = require('bunyan'),
   PrettyStream = require('bunyan-prettystream');
 
 module.exports = name => {
-  const prettyFile = new PrettyStream();
-  prettyFile.pipe(fs.createWriteStream(`/var/log/pretty_${name}_log.json`));
-  const prettyStdOut = new PrettyStream();
-  prettyStdOut.pipe(process.stdout);
   const streams = [];
-  for(let l of process.env.loggers) {
+  for(let l of process.env.loggers.split(', ')) {
     switch(l) {
       case('file'):
         streams.push({
@@ -17,6 +13,8 @@ module.exports = name => {
         });
         break;
       case('prettyFile'):
+        let prettyFile = new PrettyStream();
+        prettyFile.pipe(fs.createWriteStream(`/var/log/pretty_${name}_log.json`));
         streams.push({
           level: 'info',
           stream: prettyFile,
@@ -29,6 +27,8 @@ module.exports = name => {
         });
         break;
       case('prettyStdout'):
+        let prettyStdOut = new PrettyStream();
+        prettyStdOut.pipe(process.stdout);
         streams.push({
           level: 'info',
           stream: prettyStdOut
