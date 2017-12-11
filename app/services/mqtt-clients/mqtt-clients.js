@@ -42,7 +42,7 @@ class Clients {
       } catch(exception) {
         return reject({
           message: 'Error while trying to create and conect a new client.',
-          err: exception
+          error: exception
         });
       }
     });
@@ -63,7 +63,7 @@ class Clients {
     return new Promise((resolve, reject) => {
       this.clientsStore.getClient(clientId).publish(topic, payload, { qos, retain }, error => {
         if(error) {
-          return reject({ message: 'Error publishing.', err: error });
+          return reject({ message: 'Error publishing.', error });
         }
         return resolve({ message: 'Succesfully published.' });
       });
@@ -73,7 +73,7 @@ class Clients {
     return new Promise((resolve, reject) => {
       this.clientsStore.getClient(clientId).subscribe(topics, { qos: 1 }, error => {
         if(error) {
-          return reject({ message: 'Error subscribing', err: error });
+          return reject({ message: 'Error subscribing', error });
         }
         return resolve({ message: 'Succesfully subscribed.' });
       });
@@ -83,7 +83,7 @@ class Clients {
     return new Promise((resolve, reject) => {
       this.clientsStore.getClient(clientId).unsubscribe(topics, error => {
         if(error) {
-          return reject({ message: 'Error unsubscribing', err: error });
+          return reject({ message: 'Error unsubscribing', error });
         }
         return resolve({ message: 'Succesfully unsubscribed.' });
       });

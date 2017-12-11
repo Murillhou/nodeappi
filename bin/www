@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 
+/**
+ * If node environment does not contain the word "debug", 
+ * search for env variables file an set them with dotenv.
+ */
 if(!process.env.node_env || process.env.node_env.includes('debug')) {
   require('dotenv').config({ path: 'www.env' });
 }
@@ -13,69 +17,26 @@ const http = require('http'),
   mongoose = require('mongoose'),
   path = require('path'),
   rootPath = require('app-root-path').toString(),
-  logging = require(path.join(rootPath, 'app', 'components', 'logging'))('nodeappi'),
-  log = logging.log,
-  errorlog = logging.error;
-
-var app, port, server;
-//Connect to the MongoDB database
-mongoose.connect(
-  process.env.MONGODB_URI, {
-    useMongoClient: true,
-    reconnectTries: Number.MAX_VALUE,
-    reconnectInterval: 1000
-  }, err => {
-    (err) ? errorlog('Error connecting to the database. ' + err): log('Connected to Database: ' + process.env.MONGODB_URI);
-    app = require(path.join(rootPath.toString(), 'app', 'app'));
-    /**
-     * Get port from environment and store in Express.
-     */
-    port = normalizePort(process.env.PORT || '5000');
-    app.set('port', port);
-    /**
-     * Create HTTP server.
-     */
-    server = http.createServer(app);
-    /**
-     * Listen on provided port, on all network interfaces.
-     */
-    server.listen(port);
-    server.on('error', onError);
-    server.on('listening', onListening);
-  });
-
+  { error: errorlog, log } =
+  require(path.join(rootPath, 'app', 'components', 'logging'))('nodeappi');
 
 /**
  * Normalize a port into a number, string, or false.
  */
-function normalizePort(val) {
-  const port = parseInt(val, 10);
-
-  if(isNaN(port)) {
-    // named pipe
-    return val;
-  }
-
-  if(port >= 0) {
-    // port number
-    return port;
-  }
-
-  return false;
-}
-
+const normalizePort = val => {
+  const p = parseInt(val, 10);
+  return isNaN(p) ? val : p >= 0 ? p : false;
+};
 /**
  * Event listener for HTTP server "error" event.
  */
-function onError(error) {
+const onError = port => error => {
   if(error.syscall !== 'listen') {
     throw error;
   }
-
   const bind = typeof port === 'string' ?
     'Pipe ' + port :
     'Port ' + port;
-
   // handle specific listen errors with friendly messages
   switch(error.code) {
     case 'EACCES':
@@ -89,15 +50,39 @@ function onError(error) {
     default:
       throw error;
   }
-}
-
+};
 /**
  * Event listener for HTTP server "listening" event.
  */
-function onListening() {
+const onListening = server => () => {
   const addr = server.address();
   const bind = typeof addr === 'string' ?
     'pipe ' + addr :
     'port ' + addr.port;
   log('Listening on ' + bind);
-}
+};
+
+// Connect to the MongoDB database.
+mongoose.connect(process.env.MONGODB_URI, {
+  useMongoClient: true,
+  reconnectTries: Number.MAX_VALUE,
+  reconnectInterval: 1000
+}, err => {
+  if(err) {
+    errorlog('Error connecting to the database. ' + err);
+  } else {
+    log('Connected to Database: ' + process.env.MONGODB_URI);
+  }
+  // Import Express app.
+  const app = require(path.join(rootPath.toString(), 'app', 'app'));
+  // Get port from environment and set it on the app.
+  const port = normalizePort(process.env.PORT || '5000');
+  app.set('port', port);
+  // Create HTTP server with the app.
+  const server = http.createServer(app);
+  // Listen on provided port, on all network interfaces.
+  server.listen(port);
+  // Set event listeners.
+  server.on('error', onError(port));
+  server.on('listening', onListening(server));
+});

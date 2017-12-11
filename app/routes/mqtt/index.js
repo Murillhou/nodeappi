@@ -10,8 +10,7 @@ const passport = require('passport'),
   .functions.getUserName;
 
 router.post('/publish', [
-    passport.authenticate('jwt', { session: false }),
-    acl.middleware(2, getUserName, 'post')
+    passport.authenticate('jwt', { session: false }), acl.middleware(2, getUserName, 'post')
   ],
   endpoints.getPublishEndpoint(clientsMqtt));
 

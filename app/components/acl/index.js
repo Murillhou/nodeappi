@@ -1,24 +1,21 @@
-/**
- * http://usejsdoc.org/
- */
-
-/* jshint loopfunc:true */
-
-// Load required packages
+// Required files, libraries and modules
 const mongoose = require('mongoose'),
   NodeACL = require('acl'),
   path = require('path'),
   rootPath = require('app-root-path').toString(),
-  logging = require(path.join(rootPath, 'app', 'components', 'logging'))('nodeappi_components_acl'),
-  log = logging.log;
-
+  log = require(path.join(rootPath, 'app', 'components', 'logging'))('nodeappi_components_acl').log;
 // Generic debug logger for NodeACL
 const logger = () => ({ debug: function(msg) { log(msg); } });
+
 // Create a new access control list by providing the mongo backend
 const mongoBackend = new NodeACL.mongodbBackend(mongoose.connection.db, '_acl');
 const acl = new NodeACL(mongoBackend, logger());
 
-
+/**
+ * Set newly created user´s permisions by matching the user type(s) 
+ * with the implicitly defined user roles.
+ * @param {mongoose.Model} u User mongoose document, or any object containing a "userType" String property.
+ */
 const userCreated = u =>
   new Promise((resolve, reject) => {
     // CREATE USER SPECIFIC ROLES
@@ -49,7 +46,7 @@ const userCreated = u =>
             roles: [u.username + '_role'],
             allows: [
               { resources: '/api/mqtt', permissions: ['get', 'post'] },
-              { resources: '/api/slack', permissions: ['get', 'post'] }
+              { resources: '/api/slack', permissions: ['get'] }
             ]
           }]);
           break;
@@ -57,16 +54,16 @@ const userCreated = u =>
           acl.allow([{
             roles: [u.username + '_role'],
             allows: [
-              { resources: '/api/mqtt', permissions: ['get', 'post'] },
+              { resources: '/api/mqtt', permissions: ['get'] },
               { resources: '/api/slack', permissions: ['get', 'post'] }
             ]
           }]);
           break;
       }
       // ADD ROLE TO USER
-      acl.addUserRoles(u.username, u.username + '_role', function(err) {
-        if(err) {
-          return reject(err);
+      acl.addUserRoles(u.username, u.username + '_role', error => {
+        if(error) {
+          return reject(error);
         }
       });
     });

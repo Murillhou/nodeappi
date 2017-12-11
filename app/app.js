@@ -5,18 +5,18 @@ const express = require('express'),
   cors = require('cors'),
   helmet = require('helmet'),
   path = require('path'),
-  rootPath = require('app-root-path').toString();
-
-const errorMidd = require(path.join(__dirname, 'middlewares')).errors,
+  rootPath = require('app-root-path').toString(),
+  errorMidd = require(path.join(__dirname, 'middlewares', 'errors')),
   authentication = require(path.join(__dirname, 'components', 'authentication')),
   routes = require(path.join(__dirname, 'routes')),
-  static = require(path.join(__dirname, 'routes', 'static'));
+  static = require(path.join(__dirname, 'routes', 'static')),
+  User = require(path.join(rootPath, 'app', 'components', 'users', 'model', 'user'));
 
 // Initialize express app
 const app = express();
 
 // pass passport for configuration
-authentication.configPassport(passport);
+authentication.configPassport(passport, User);
 
 // Apply middlewares (ensure order)
 app.use(cors());
@@ -36,6 +36,6 @@ app.use(express.static('public'));
 app.use(static);
 
 // Handle errors
-app.get(errorMidd);
+app.use(errorMidd);
 
 module.exports = app;

@@ -19,8 +19,8 @@ const authenticateUser = (req, res) =>
       res.status(400).send({ success: false, message: 'User not found.' });
     } else {
       // check if password matches
-      user.comparePassword(req.body.password, function(err, isMatch) {
-        if(isMatch && !err) {
+      user.comparePassword(req.body.password, function(error, isMatch) {
+        if(isMatch && !error) {
           // if user is found and password is right create a token
           const token = authFunctions.buildToken(user);
           // return the information including token as JSON
@@ -31,7 +31,7 @@ const authenticateUser = (req, res) =>
       });
     }
   }, error => {
-    res.status(500).send({ success: false, err: error });
+    res.status(500).send({ success: false, error });
   });
 // CORE MODEL CONTROLLER FUNCTIONS
 const getUser = query =>
@@ -131,14 +131,14 @@ const postUsersFilter = (req, res, next) => {
     res.status(500).send({
       success: false,
       message: 'Nothing inserted, 0 users in POST body',
-      err: 'Nothing inserted, 0 users in POST body'
+      error: new Error('Nothing inserted, 0 users in POST body')
     });
   } else {
     // if(!req.params._client) {
     //   res.status(500).send({
     //     success: false,
     //     message: 'Nothing inserted, no client specified.',
-    //     err: 'Nothing inserted, no client specified.'
+    //     error: new Error('Nothing inserted, no client specified.')
     //   });
     // } else {
     //   req.body = mapAssign({ _client: req.params._client })(req.body);
@@ -161,7 +161,7 @@ const postUsersREST = (req, res) => {
     .catch(error => res.status(500).send({
       success: false,
       message: error.message,
-      err: error
+      error
     }));
 };
 /**
@@ -174,7 +174,7 @@ const getUserREST = (req, res) =>
   .then(result => res.status(result ? 200 : 400).send(
     result ? { success: true, data: _.omit(result._doc, 'password') } : { success: false, message: 'Can´t find the specified user.' }
   ))
-  .catch(error => res.status(500).send({ success: false, message: error, err: error }));
+  .catch(error => res.status(500).send({ success: false, message: error, error }));
 
 /**
  * Express endpoint for GET on /api/users access point route.
@@ -187,7 +187,7 @@ const getUsersREST = (req, res) => {
       res.status(200).send(
         results ? { success: true, data: results.map(r => _.omit(r._doc, 'password')) } : { success: true, message: 'Can´t find any users.' }))
     .catch(error =>
-      res.status(500).send({ success: false, message: 'Failed while trying to get the users.', err: error }));
+      res.status(500).send({ success: false, message: 'Failed while trying to get the users.', error }));
 };
 /**
  * Express endpoints for DELETE on /clients/:_client/users/:_user and /users/:_user access points routes.
@@ -199,7 +199,7 @@ const deleteUserREST = (req, res) => {
     .then(result =>
       res.status(result ? 200 : 400).send(result ? { success: true, message: 'User deleted.' } : { success: false, message: 'User not found.' }))
     .catch(error =>
-      res.status(500).send({ success: false, message: 'Failed while trying to delete the user.', err: error }));
+      res.status(500).send({ success: false, message: 'Failed while trying to delete the user.', error }));
 };
 
 module.exports = {

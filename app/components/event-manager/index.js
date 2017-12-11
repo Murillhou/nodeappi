@@ -1,9 +1,8 @@
 const events = require('events'),
   path = require('path'),
   rootPath = require('app-root-path').toString(),
-  logging = require(path.join(rootPath, 'app', 'components', 'logging'))('nodeappi_components_eventmanager'),
-  log = logging.log,
-  errorlog = logging.errorlog,
+  { error: errorlog, log } = require(path.join(rootPath, 'app', 'components', 'logging'))
+  ('nodeappi_components_eventmanager'),
   acl = require(path.join(rootPath, 'app', 'components', 'acl'));
 
 class EventManager extends events.EventEmitter {

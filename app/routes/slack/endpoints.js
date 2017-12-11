@@ -1,13 +1,14 @@
 const path = require('path'),
   rootPath = require('app-root-path').toString(),
-  logging = require(path.join(rootPath, 'app', 'components', 'logging'))('nodeappi_routes_slack'),
-  log = logging.log,
-  errorlog = logging.errorlog,
+  { error: errorlog, log } =
+  require(path.join(rootPath, 'app', 'components', 'logging'))('nodeappi_routes_slack'),
   getUserName = require(path.join(rootPath.toString(), 'app', 'components', 'authentication'))
   .functions.getUserName;
 
-
-
+/**
+ * Returns an Express endpoint for posting messages given a slackbot instance
+ * @param {app.services.slack-bot.slackBot.Bot} slackBot 
+ */
 const getPostMessageEndpoint = slackBot => (req, res) => {
   slackBot.postMessage('(Message received from nodeappi slackbot service, user: ' +
       getUserName(req, res) +

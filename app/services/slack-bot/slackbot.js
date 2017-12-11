@@ -1,10 +1,11 @@
 const _ = require('lodash'),
-  slack = require('slack');
+  slack = require('slack'),
+  conf = require(require('path').join(require('app-root-path').toString(), 'app', 'config'));
 class Bot {
   constructor() {
-    slack.channels.list({ token: process.env.slackbotToken })
+    slack.channels.list({ token: conf.slackbotToken })
       .then(result => {
-        if(!_.find(result.channels, c => c.name === process.env.slackbotChannel)) {
+        if(!_.find(result.channels, c => c.name === conf.slackbotChannel)) {
           throw new Error('Specified channel doesn´t exists.');
         }
       })
@@ -13,7 +14,12 @@ class Bot {
       });
   }
   postMessage(text) {
-    return slack.chat.postMessage({ token: process.env.slackbotToken, channel: process.env.slackbotChannel, text });
+
+    return slack.chat.postMessage({
+      token: conf.slackbotToken,
+      channel: conf.slackbotChannel,
+      text
+    });
   }
 }
 module.exports = Bot;

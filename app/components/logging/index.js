@@ -1,14 +1,15 @@
-if(!process.env.loggers) {
-  throw new Error('Missing environment variables: loggers');
-}
-
-const bunyan = require('bunyan'),
+const conf = require(require('path').join(require('app-root-path').toString(), 'app', 'config')),
+  bunyan = require('bunyan'),
   fs = require('fs'),
   PrettyStream = require('bunyan-prettystream');
 
+if(!conf.loggers) {
+  throw new Error('Missing environment variables: loggers');
+}
+
 module.exports = name => {
   const streams = [];
-  for(let l of process.env.loggers.split(', ')) {
+  for(let l of conf.loggers.split(', ')) {
     switch(l) {
       case('file'):
         streams.push({
@@ -40,7 +41,6 @@ module.exports = name => {
         break;
     }
   }
-
   const logger = bunyan.createLogger({
     name,
     type: 'raw',
@@ -49,13 +49,13 @@ module.exports = name => {
   return {
     error: (err, ...rest) => {
       logger.error(err, rest.length ? rest.join() : '');
-      if(process.env.node_env && process.env.node_env.includes('debug')) {
+      if(conf.node_env && conf.node_env.includes('debug')) {
         console.log(' ' + name + '-' + Date.now() + ': ', err, rest.length ? rest.join() : '');
       }
     },
     log: (msg, ...rest) => {
       logger.info(msg, rest.length ? rest.join() : '');
-      if(process.env.node_env && process.env.node_env.includes('debug')) {
+      if(conf.node_env && conf.node_env.includes('debug')) {
         console.log(' ' + name + '-' + Date.now() + ': ', msg, rest.length ? rest.join() : '');
       }
     }

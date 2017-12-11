@@ -9,7 +9,6 @@ const express = require('express'),
   getUserName = require(path.join(rootPath, 'app', 'components', 'authentication'))
   .functions.getUserName;
 
-
 router.post('/postmessage', [
     passport.authenticate('jwt', { session: false }),
     acl.middleware(2, getUserName, 'post')
